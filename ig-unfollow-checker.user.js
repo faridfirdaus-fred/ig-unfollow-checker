@@ -1,14 +1,14 @@
 // ==UserScript==
 // @name         Instagram Unfollow Checker
 // @namespace    https://github.com/faridfirdaus-fred/ig-unfollow-checker
-// @version      1.0.0
+// @version      1.0.1
 // @description  Cek siapa following Instagram yang tidak follow back langsung di browser dengan UI modern dan aman.
 // @author       Farid Firdaus
 // @match        https://*.instagram.com/*
 // @icon         https://www.instagram.com/static/images/ico/favicon-192.png/68d99ba29cc8.png
 // @grant        GM_setClipboard
 // @grant        GM_download
-// @run-at       document-idle
+// @run-at       document-end
 // @updateURL    https://raw.githubusercontent.com/faridfirdaus-fred/ig-unfollow-checker/main/ig-unfollow-checker.user.js
 // @downloadURL  https://raw.githubusercontent.com/faridfirdaus-fred/ig-unfollow-checker/main/ig-unfollow-checker.user.js
 // ==/UserScript==
@@ -16,16 +16,16 @@
 (function () {
   'use strict';
 
-  // Tambahkan floating trigger button di pojok kanan bawah
+  // Tambahkan floating trigger button di atas widget Messages (pojok kanan bawah)
   function initTriggerButton() {
-    if (document.getElementById('ig-checker-trigger-btn')) return;
+    if (!document.body || document.getElementById('ig-checker-trigger-btn')) return;
 
     const btn = document.createElement('button');
     btn.id = 'ig-checker-trigger-btn';
     btn.innerHTML = '🔍 Check Follback';
     btn.style.cssText = `
       position: fixed;
-      bottom: 24px;
+      bottom: 84px;
       right: 24px;
       z-index: 999998;
       background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
@@ -36,7 +36,7 @@
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       transition: transform 0.2s, box-shadow 0.2s;
     `;
@@ -307,7 +307,15 @@
     })();
   }
 
-  // Jalankan inisialisasi tombol trigger
-  window.addEventListener('load', initTriggerButton);
-  setTimeout(initTriggerButton, 2000);
+  // Inisialisasi tombol trigger & observer agar tahan navigasi dinamis Instagram (SPA)
+  function start() {
+    initTriggerButton();
+    setInterval(initTriggerButton, 2000);
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', start);
+  } else {
+    start();
+  }
 })();
